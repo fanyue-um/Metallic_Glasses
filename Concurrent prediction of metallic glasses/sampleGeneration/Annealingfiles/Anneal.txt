@@ -1,0 +1,91 @@
+clear
+variable		    fname	index Cooling_final.txt
+variable		    fixtemperature equal Bashchangeval1
+#####################################################
+# INITIALIZATION
+units           metal 
+dimension		    3 
+boundary		    p p p
+atom_style	    atomic
+read_data		    ${fname}
+
+#####################################################
+# Dreiding potential information
+pair_style		  eam/alloy
+pair_coeff		  * * ZrCu.lammps.eam Zr Cu
+neighbor		    4.0 bin 
+neigh_modify	  delay 10 check yes 
+
+compute         peatom all pe/atom
+
+#####################################################
+# Relaxation
+reset_timestep  0
+dump			      1 all custom 50000 energyrelax.txt id type c_peatom x y z
+restart			    50000 energyrelax.*
+
+velocity		    all create ${fixtemperature} ${seed}
+fix			        1 all nvt temp ${fixtemperature} ${fixtemperature} 0.1
+thermo_style	  custom step temp etotal pe ke lx ly lz press
+thermo			    50000
+timestep		    0.001
+run			        10000000
+
+unfix			      1
+undump			    1
+
+
+#####################################################
+#####################################################
+# Energy extraction
+
+#####################################################
+# INITIALIZATION
+clear
+
+#####################################################
+# Loops
+variable		    times loop 1 200
+label			      loop
+
+clear
+units			      metal
+dimension		    3
+boundary		    p p p
+atom_style		  atomic
+variable		    name equal 50000*${times}
+read_restart	  energyrelax.${name}
+
+#####################################################
+# Dreiding potential information
+pair_style		  eam/alloy
+pair_coeff		  * * ZrCu.lammps.eam Zr Cu
+neighbor		    4.0 bin 
+neigh_modify	  delay 10 check yes 
+
+#####################################################
+# Output Energy
+compute         peatom all pe/atom
+compute         potentialenergy all pe
+compute         temperature all temp
+variable		temperature equal temp
+variable		potenenergy equal pe
+variable		time equal ${name}*0.001
+
+reset_timestep  0
+timestep		0.001
+
+thermo          1000
+thermo_style    custom step temp etotal pe ke lx ly lz press
+min_style       cg
+minimize        1.0e-25 1.0e-25 100000 100000
+
+fix             extra all print 1 "Potential energy temperature and time =,${potenenergy},${temperature},${time}" append minimizeenergy.txt
+run             1
+unfix		extra
+
+reset_timestep	${times}
+write_data		  ML.*.txt
+
+next            times
+jump            Anneal.txt loop

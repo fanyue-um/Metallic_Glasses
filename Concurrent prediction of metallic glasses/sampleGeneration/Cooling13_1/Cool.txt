@@ -1,0 +1,62 @@
+clear
+variable		fname	index Initial_48.txt
+#####################################################
+# INITIALIZATION
+units			metal 
+dimension		3 
+boundary		p p p
+atom_style		atomic
+read_data		${fname}
+
+#####################################################
+# Dreiding potential information
+pair_style		eam/alloy
+pair_coeff		* * ZrCu.lammps.eam Zr Cu
+neighbor		4.0 bin 
+neigh_modify		delay 10 check yes 
+
+#####################################################
+# Heat Process
+compute			temperature all temp
+compute			potentialenergy all pe
+
+reset_timestep  	0
+
+dump			1 all custom 100000 pe1.txt id type x y z
+velocity		all create 2000.1 ${seed}
+fix			1 all nvt temp 2000.1 2000.1 0.1
+thermo_style		custom step pe temp
+thermo			100000
+timestep		0.001
+run			10000000
+
+unfix			1
+undump			1
+
+#####################################################
+# Cooling Process
+reset_timestep		0
+dump			2 all custom 2000 pe2.txt id type x y z
+
+fix			2 all nvt temp 2000.1 0.1 0.1
+thermo_style		custom step pe temp
+thermo			100
+timestep		0.001
+run			200000
+
+unfix			2
+undump			2
+
+#####################################################
+# Minimization
+reset_timestep		0
+timestep		0.001
+thermo			100
+
+variable		temperature equal temp
+variable		potenenergy equal pe
+
+thermo_style		custom step pe temp
+minimize		1.0e-25 1.0e-25 100000 100000
+
+write_data		Cooling_final.txt
