@@ -1,0 +1,24 @@
+CC = mpicc
+HEADER = bmg.h my_fft.h bmgFlags.h
+CFLAGS = -Wall -g -std=c99
+SEEKFLAG = -DMPICH_IGNORE_CXX_SEEK
+INCLUDES = -I/public/home/pzhao/Soft_mu01/include 
+LFLAGS = -L/public/home/pzhao/Soft_mu01/lib
+LIBS = -lfftw_mpi -lfftw -lgsl -lgslcblas -lm
+SRCS = bmg.c io.c init.c elastic.c evolution.c
+OBJS = $(SRCS:.c=.o)
+MAIN = bmg
+.PHONY: depend clean
+#all: $(MAIN)
+
+$(MAIN): $(OBJS) Makefile
+	$(CC) $(SEEKFLAG) $(CFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS) 
+
+%.o: %.c $(HEADER) Makefile
+	$(CC) $(SEEKFLAG) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
+clean:
+	$(RM) *.o *~ $(MAIN)
+
+depend: $(SRCS)
+	makedepend $^

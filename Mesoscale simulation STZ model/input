@@ -1,0 +1,51 @@
+Moduli(E, nu):
+69.46 0.365
+
+Stress-free energy barrier:
+2.0
+
+Applied strain rate:
+1e-4
+
+Strain increment:
+1e-4
+
+Random seed:
+123
+
+Random ratio of fluctuation in energy barrier:
+0.2
+
+Print period:
+5
+
+End Strain:
+0.06
+
+Softening Flag:
+1
+
+Relaxation Time:
+0.
+
+Characteristic Xtal shear:
+0.04
+
+Barrier for Xtal shear:
+1.25
+
+Ratio for generating residual stress:
+0.06
+
+Residual stress data file:
+NullSpaceBasis_128x128_Nullity254.out
+
+Volume fraction of crystal-like MRO:
+0.0
+
+Initialization condition for MRO:
+0
+
+Stress-free energy barrier for crystal-like MRO:
+2.0
+

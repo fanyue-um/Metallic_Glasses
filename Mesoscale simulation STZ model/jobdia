@@ -1,0 +1,25 @@
+#!/bin/bash
+
+#PBS -N BMG_LowT
+#PBS -l nodes=1:ppn=8
+#PBS -l walltime=48:00:00
+#merge output and error messages
+#PBS -j oe
+#PBS -m abe
+# mail address
+#PBS -M zhaopy@matsceng.ohio-state.edu
+
+#PBS -V
+#PBS -S /bin/bash
+
+WORKDIR=/public/home/pzhao/work/MG/2D/parallel/data/dilatation/T300_22
+PPN=$(cat $PBS_NODEFILE | wc -l)
+
+MG_MAIN=bmg
+MG_INPUT=input
+
+cd $WORKDIR
+
+mpirun -np $PPN -machinefile $PBS_NODEFILE ./$MG_MAIN $MG_INPUT > output
+
+pwd;data;ls -lrt
