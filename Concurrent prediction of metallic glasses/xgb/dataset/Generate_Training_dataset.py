@@ -39,12 +39,3 @@ for inilabel in ['11_1', '12_1']:
                     testing.write('%s' % lines[structures[i]])
                     line = lines[structures[i]].split()
                     testingenergy.write('%s\n' % line[0])
-
-        structures = structures[:train_number]
-        shuffle(structures)
-        with open('../SOAP_parameter.txt','a') as parameter:
-            with open('../ML_parameter_ISenergy.txt','a') as parameterenergy:
-                for i in range(parameter_number):
-                    parameter.write('%s' % lines[structures[i]])
-                    line = lines[structures[i]].split()
-                    parameterenergy.write('%s\n' % line[0])
